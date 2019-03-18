@@ -72,13 +72,13 @@ tags:
   - name: Operations
     description: Operations related methods (perform payments to beneficiaries)
 securityDefinitions:
-  JWT:
+  SessionToken:
     description: You can obtain a security token using the Authorization methods provided by the API
     type: apiKey
     name: 'Authorization: token'
     in: header
 security:
-  - JWT: []
+  - SessionToken: []
 paths:
   /authorization/session:
     post:
