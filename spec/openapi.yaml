@@ -623,7 +623,7 @@ definitions:
         example: "2019-01-24"
   BankAccountType: 
     type: string
-    enum: &BANKACCOUNTTYPE
+    enum: 
       - IBAN
       - STANDARD
       - ABA-FEDWIRE
@@ -645,9 +645,7 @@ definitions:
         type: "string"
         example: "Bank Account test"
       type: 
-        type: "string"
-        enum: *BANKACCOUNTTYPE
-        example: "IBAN"
+       $ref: '#/definitions/BankAccountType'
       account_number: 
         type: "string"
         example: "ES6621000418401234567891"
@@ -702,9 +700,7 @@ definitions:
         type: "string"
         example: "Bank Account test"
       type: 
-        type: "string"
-        enum: *BANKACCOUNTTYPE
-        example: "IBAN"
+        $ref: '#/definitions/BankAccountType'
       account_number: 
         type: "string"
         example: "ES6621000418401234567891"
@@ -755,14 +751,14 @@ definitions:
         
   StatusEnum: 
     type: string
-    enum: &STATUS
+    enum: 
       - ACTIVE
       - INACTIVE
       - PENDING
       - AUTHORIZED
   CustomerTypeEnum: 
     type: string
-    enum: &CUSTOMERTYPE
+    enum:
       - INDIVIDUAL
       - CORPORATE
   Beneficiary:
@@ -777,9 +773,7 @@ definitions:
         type: "number"
         example: 2342323
       status: 
-        type: string 
-        example: "ACTIVE"
-        enum: *STATUS
+       $ref: '#/definitions/StatusEnum'
       name: 
         type: "string"
         example: "Beneficiary Test Name"
@@ -787,9 +781,7 @@ definitions:
         type: "string"
         example: "Some note of the customer"
       type: 
-        type: "string"
-        enum: *CUSTOMERTYPE
-        example: "INDIVIDUAL"
+       $ref: '#/definitions/CustomerTypeEnum'
       email: 
         type: "string"
         example: "test@test.com"
@@ -827,9 +819,7 @@ definitions:
         type: "string"
         example: "Some note of the customer"
       type: 
-        type: "string"
-        enum: *CUSTOMERTYPE
-        example: "INDIVIDUAL"
+        $ref: '#/definitions/CustomerTypeEnum'
       email: 
         type: "string"
         example: "test@test.com"
@@ -877,9 +867,7 @@ definitions:
         type: "string"
         example: "132165 96816 8461"
       status: 
-        type: string
-        enum: *STATUS
-        example: "ACTIVE"
+        $ref: '#/definitions/StatusEnum'
       swift_code: 
         type: "string"
         example: "BKBK ES"
@@ -916,7 +904,7 @@ definitions:
         type: "string"
   LoginResponse:
     required:
-      - "sessionToken"
+      - "session_token"
     properties:
       session_token:
         type: "string"
