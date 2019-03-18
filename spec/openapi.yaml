@@ -1,249 +1,936 @@
-# This is an **example** API to demonstrate features of OpenAPI specification.
-# It doesn't cover all OpenAPI features. For more full example check out: https://github.com/APIs-guru/petstore_extended
-
-openapi: 3.0.0
+swagger: "2.0"
+schemes:
+  - https # Remove if your API doesn't support HTTPS
+host: api-zohan.greysystems.eu # Replace with your hostname. You can also specify port e.g. example.com:777
+basePath: /v1 # Replace with your basePath. Note: SHOULD begin with '/'.
 info:
-  version: '1.0.0' # Your API version
+  description: |
+    This page contains the documentation on how to use the Zohan API intended for customers already connected to the platform of Fidelis.
+
+    **API is in beta version, breaking changes may be introduced before the final release candidate is released**
+    # Introduction
+    Fidelis offers a platform to manage the entire lifecycle of you
+
+    The Fidelis Zohan API is built on top of HTTP:
+    * RESTFul.
+    * Predictable resource URLs.
+    * It returns HTTP response codes to indicate errors.
+    * It also accepts and returns JSON in the HTTP body.
+
+    You can use your favorite HTTP/REST library for your programming language to consume this API.
+
+    # Fidelis Zohan API Structure
+
+    * **Authorization**: The different methods to manage  sessions in the platform
+    * **Data Assets**: Api methods to consume the different data catalogs provided by Fidelis Zohan API. These methods are required for the rest of the modules and are useful to query countries/cities and currencies general data.
+    * **Wallets**: Methods to query the different wallet accounts configured for your account.
+    * **Beneficiaries**: Methods to create and query the different beneficiaries and the beneficiary bank accounts.
+    * **Payments**: Methods to perform payments.
+
+
+    # Common HTTP Error Responses
+
+    The Fidelis Zohan API uses the following common HTTP status codes to communicate general issues or errors to the clients\:
+
+    * HTTP  **401** (Non authorized): The token provided is expired, inexistent or non-valid
+    * HTTP **403** (Forbidden): Token is valid, however the holder of the token is not authorised to perform the call
+    * HTTP **400** (Invalid Request): The request provided is invalid (request is not well formed, a mandatory field is not provided, etc..).
+    * HTTP **500** (Internal Server Error): Some internal component has failed to process your request. Please notify about this error to GreySystems team.
+    
+    # Data Formats
+    
+    * Country: Countries are always declared as the iso-3 (3 chars) following ISO 3166 standard. Check [ISO-3166](https://www.iso.org/iso-3166-country-codes.html).
+    * Currency: Currencies are always declared as the currency code (3 chars) following ISO 4217 standard. Check [ISO-4217](https://www.iso.org/iso-4217-currency-codes.html)
+    * Dates: Dates are always declared and consumed using the format `yyyy-MM-dd` where: 
+      * `yyyy`: 4 digit year format, for example `2019`.
+      * `MM`: 2-digit month starting at `01` (January) to `12` (December).
+      * `dd`: 2-digit day of month starting at `01`.
+
+  version: "1.0.0-beta" # Your API version
   # It can be any string but it is better to use semantic versioning: http://semver.org/
   # Warning: OpenAPI require version to be string, but without quotation YAML can recognize it as number.
-  
-  title: Example.com # Replace with your API title
-  # Keep it simple. Don't add "API" or version at the end of the string.
 
-  termsOfService: 'https://example.com/terms/' # [Optional] Replace with an URL to your ToS
+  title: Fidelis Zohan API Documentation
+
+  termsOfService: "https://www.greysystems.eu" # [Optional] Replace with an URL to your ToS
   contact:
-    email: contact@example.com # [Optional] Replace with your contact email
-    url: 'http://example.com/contact' # [Optional] Replace with link to your contact form
+    email: developers@greysystems.eu # [Optional] Replace with your contact email
+    url: "http://www.greysystems.eu/#contact" # [Optional] Replace with link to your contact form
   license:
-    name: Apache 2.0
-    url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
+    name: All Rights reserved GreySystems 2019
+    url: "http://www.greysystems.eu"
   x-logo:
-    url: 'https://apis.guru/openapi-template/logo.png'
-  
-  # Describe your API here, you can use GFM (https://guides.github.com/features/mastering-markdown) here
-  description: |
-    This is an **example** API to demonstrate features of OpenAPI specification
-    # Introduction
-    This specification is intended to to be a good starting point for describing your API in 
-    [OpenAPI/Swagger format](https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md).
-    It also demonstrates features of [generator-openapi-repo](https://github.com/Rebilly/generator-openapi-repo) tool and 
-    [ReDoc](https://github.com/Rebilly/ReDoc) documentation engine. So beyond the standard OpenAPI syntax we use a few 
-    [vendor extensions](https://github.com/Rebilly/ReDoc/blob/master/docs/redoc-vendor-extensions.md).
+    url: "https://github.com/grey-systems/zohan-customer-api-docs/raw/master/assets/logo.png"
+produces:
+  - application/json
 
-    # OpenAPI Specification
-    The goal of The OpenAPI Specification is to define a standard, language-agnostic interface to REST APIs which
-    allows both humans and computers to discover and understand the capabilities of the service without access to source
-    code, documentation, or through network traffic inspection. When properly defined via OpenAPI, a consumer can 
-    understand and interact with the remote service with a minimal amount of implementation logic. Similar to what
-    interfaces have done for lower-level programming, OpenAPI removes the guesswork in calling the service.
-externalDocs:
-  description: Find out how to create Github repo for your OpenAPI spec.
-  url: 'https://github.com/Rebilly/generator-openapi-repo'
+consumes:
+  # List of mime types your API endpoints consumes.
+  # This is a global default. You can OVERWRITE it in each specific operation.
+  # Remove the ones not supported by your API
+  - application/json
 
-# A list of tags used by the specification with additional metadata.
-# The order of the tags can be used to reflect on their order by the parsing tools.
 tags:
-  - name: Echo
-    description: Example echo operations
-  - name: User
-    description: Operations about user
-servers:
-  - url: 'http://example.com/api/v1'
-  - url: 'https://example.com/api/v1'
+  - name: Authorization
+    description: Operations to manage sessions against the API
+  - name: Data Assets
+    description: Operations to get information about data catalogs (countries/cities/currencies)
+  - name: Wallets
+    description: Operations to manage the different wallet accounts
+  - name: Beneficiaries
+    description: Operations to manage beneficiary and the beneficiary bank accounts
+  - name: Operations
+    description: Operations related methods (perform payments to beneficiaries)
 
-# Holds the relative paths to the individual endpoints. The path is appended to the
-# basePath in order to construct the full URL. 
+# Security scheme definitions that can be used across the specification.
+securityDefinitions:
+  JWT:
+    description: You can obtain a security token using the Authorization methods provided by the API
+    type: apiKey
+    name: "Authorization: token"
+    in: header
+
+security:
+  - JWT: []
+
 paths:
-  '/users/{username}': # path parameter in curly braces
-
-    # parameters list that are used with each operation for this path
-    parameters:
-      - name: pretty_print
-        in: query
-        description: Pretty print response
-        schema:
-          type: boolean
-    get: # documentation for GET operation for this path
+  "/authorization/session":
+    post:
       tags:
-        - User
-      
-      # summary is up to 120 symbold but we recommend to be shortest as possible
-      summary: Get user by user name
-      
-      # you can use GFM in operation description too: https://guides.github.com/features/mastering-markdown
+        - Authorization
+      summary: Creates a new session in the platform, and returns a security token
+      operationId: login
       description: |
-        Some description of the operation. 
-        You can use `markdown` here.
-      
-      # operationId should be unique across the whole specification
-      operationId: getUserByName
-      
-      # list of parameters for the operation
+        Performs a login in the system, creates a session and returns a security token, that need to be used in consecuent calls to the API, by setting the header Authorization with the token given by this method, like this \:
+
+        ```
+        Authorization: {token}
+        ```
+
+        The  `expires_in` parameter of the response determines the number of the seconds from now that the token will be valid until to. Note that this is inactivity time, if the token is used, the `expires_in` will be reset.
+
       parameters:
-        - name: username
-          in: path
-          description: The name that needs to be fetched
+        - name: loginRequest
+          in: body
+          description: The login credentials
           required: true
           schema:
-            type: string
-        - name: with_email
+            $ref: "#/definitions/LoginRequest"
+      security: []
+      responses:
+        "200":
+          description: Login OK, token is returned
+          schema:
+            $ref: "#/definitions/LoginResponse"
+        "403":
+          description: Invalid Credentials, please review your user and password
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+        "400":
+          description: The request is not well built. The message of the response contains detailed information about the reason
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+
+    delete:
+      tags:
+        - Authorization
+      summary: Deletes an open session
+      operationId: logout
+      description: Removes and invalidates a valid token previously issued. If the token is already expired this operation will return indicating that the token is not found.
+      responses:
+        "204":
+          description: Session logout and token invalidated OK. No body is returned
+        "404":
+          description: Token is missing, or expired. You should handle this result as logout OK.
+  
+  "/wallet":
+    get:
+      tags: 
+        - Wallets
+      summary: Gets all the wallets that belongs to your account
+      operationId: getWallets
+      description: Gets all the wallet accounts that belongs to your account.
+      parameters: 
+        - name: currency
+          description: Currency isocode to filter the wallet accounts
+          required: false
           in: query
-          description: Filter users without email
-          schema:
-            type: boolean
-      
-      # security schemas applied to this operation
-      security:
-        - main_auth:
-            - 'read:users' # for auth2 provide list of scopes here
-        - api_key: []
-      responses: # list of responses
-        '200':
-          description: Success
-          content:
-            application/json: # operation response mime type
-              schema: # response schema can be specified for each response
-                $ref: '#/components/schemas/User'
-              example: # response example
-                username: user1
-                email: user@example.com
-        '403':
-          description: Forbidden
-        '404':
-          description: User not found
-    # documentation for PUT operation for this path
-    put:
-      tags:
-        - User
-      summary: Updated user
-      description: This can only be done by the logged in user.
-      operationId: updateUser
+          type: string
+          
+      responses:
+        "200": 
+          description: Gets the list of wallets of your account. IF no accounts have been found, it returns an empty array
+          schema: 
+            type: array
+            items:
+              $ref: '#/definitions/Wallet'
+  "/wallet/{id}":
+    get: 
+      tags: 
+        - Wallets
+      summary: Gets a single wallet by its id
+      operationId: getWalletById
       parameters:
-        - name: username
+        - name: id
+          description: the id of the wallet
+          required: true
+          type: string
           in: path
-          description: The name that needs to be updated
+      responses:
+        "200": 
+          description: Wallet found and returned
+          schema:
+            $ref: '#/definitions/Wallet'
+        "404": 
+          description: Wallet not found 
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+              
+          
+  "/beneficiary": 
+    get: 
+      tags: 
+        - Beneficiaries
+      summary: Gets a list of all beneficiaries that belongs to your account 
+      operationId: getBeneficiaries
+      responses:
+        "200": 
+          description: List of beneficiaries that belongs to your account. It will return an empty list if no beneficiaries are already created
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Beneficiary'
+    post:
+      tags: 
+        - Beneficiaries
+      summary: Creates a new beneficiary 
+      operationId: createsBeneficiary
+      parameters: 
+        - name: beneficiary
+          in: body 
+          description: The beneficiary to be created
           required: true
           schema:
-            type: string
-      security:
-        - main_auth:
-            - 'write:users'
+            $ref: '#/definitions/BeneficiaryCreation'
       responses:
-        '200':
-          description: OK
-        '400':
-          description: Invalid user supplied
-        '404':
-          description: User not found
-      # request body documentation
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/User'
-          application/xml:
-            schema:
-              $ref: '#/components/schemas/User'
-        description: Updated user object
-        required: true
-  /echo: # path parameter in curly braces
-    post: # documentation for POST operation for this path
-      tags:
-        - Echo
-      summary: Echo test
-      description: Receive the exact message you've sent
-      operationId: echo
-      security:
-        - api_key: []
-        - basic_auth: []
+        "201":
+          description: The beneficiary has been correctly created. The id of the new beneficiary is returned
+          schema:
+            $ref: '#/definitions/CreationDto'
+        "400": 
+          description: Invalid request, some mandatory field is missing or a validation over the request is not met. The response body contains full description of the error
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+  "/beneficiary/{id}": 
+     get: 
+      tags: 
+        - Beneficiaries
+      summary: Gets a single beneficiary by its id
+      parameters: 
+        - name: id
+          in: path
+          required: true
+          description: The id of the beneficiary
+          type: number
+      operationId: getBeneficiaryById
       responses:
-        '200':
-          description: OK
-          # document headers for this response
-          headers:
-            X-Rate-Limit: # Header name
-              description: calls per hour allowed by the user
-              schema: # Header schema
-                type: integer
-                format: int32
-            X-Expires-After:
-              $ref: '#/components/headers/ExpiresAfter'
-          content:
-            application/json:
-              schema:
-                type: string
-              examples:
-                response:
-                  value: Hello world!
-            application/xml:
-              schema:
-                type: string
-            text/csv:
-              schema:
-                type: string
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: string
-              example: Hello world!
-          application/xml:
-            schema:
-              type: string
-              example: Hello world!
-        description: Echo payload
-        required: true
+        "200": 
+          description: The beneficiary identified by the id given as parameter
+          schema:
+            $ref: '#/definitions/Beneficiary'
+        "404": 
+          description: The beneficiary identified by id does not exist
+          
+  "/beneficiary/{id}/bankAccount":
+    get: 
+      tags: 
+        - Beneficiaries
+      summary: Gets the list of bank accounts that belongs to a  beneficiary
+      description: | 
+        Gets the list of bank accounts assigned to the beneficiary identified by `id` parameter.
         
-# An object to hold reusable parts that can be used across the spec
-components:
-  schemas:
-    Email:
-      description: User email address
-      type: string
-      format: test
-      example: john.smith@example.com
-    User:
-      type: object
-      properties:
-        username:
-          description: User supplied username
+        You can also use `currency` query parameter to filter out results for those accounts with the currency isocode given as value of the parameter.
+        
+        * `intermediary_bank` data is provided if and only if `use_intermediary_bank` is true. Otherwise will be null
+        * `routing_code` will be present if and only if the bank account type is `ABA-FEDWIRE`
+        
+      parameters: 
+        - name: currency 
+          in: query
+          description: Currency isocode to filter results 
           type: string
-          minLength: 4
-          example: John78
-        firstName:
-          description: User first name
+          required: false
+          
+        - name: id
+          in: path
+          required: true
+          description: The id of the beneficiary
+          type: number
+      operationId: getBeneficiaryBankAccounts
+      responses:
+        "200": 
+          description: List of bank accounts that belongs to the beneficiary
+          schema:
+            $ref: '#/definitions/BeneficiaryBankAccount'
+        "404": 
+          description: The beneficiary identified by id does not exist 
+          
+    post: 
+      tags: 
+        - Beneficiaries
+      summary: Gets the list of bank accounts that belongs to a  beneficiary
+      parameters: 
+        - name: id
+          in: path
+          required: true
+          description: The id of the beneficiary
+          type: number
+        - name: bankAccount
+          in: body 
+          required: true
+          description: The bank account to create
+          schema:
+            $ref: '#/definitions/BeneficiaryBankAccountCreation'
+            
+      description: | 
+        Creates a bank account associated to the customer identified by `id` path parameter
+        
+        **Dynamic Validations**
+        * if `use_intermediary_bank` is true, you have to provide `intermediary_bank` property
+        * if `type` is set to `ABA-FEDWIRE`, the parameter `routing_code` is required.
+        * `name` should be unique, and cannot be duplicated
+        * `city` must be a valid city (check `Data Assets` module of this API)
+      
+      responses:
+        "201": 
+          description: Bank Account for beneficiary created OK
+          schema:
+            $ref: '#/definitions/CreationDto'
+        "400": 
+          description: Invalid request, the request contains some validation error. Response message a description of the problem. 
+          schema: 
+            $ref: '#/definitions/ErrorResponse'
+        "404": 
+          description: The beneficiary identified by `id` path parameter does not exist
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+  
+      
+  "/operation/payment": 
+    post: 
+      tags: 
+        - Operations
+      summary: Generate a new payment to a beneficiary's bank account 
+      operationId: doPayment
+      description: | 
+      
+        Generates a new payment to a beneficiary bank account. 
+        
+        **Validations**
+        * `beneficiary_id`, `beneficiary_bank_account_id` and `wallet_account_id` must exist
+        * `payment_amount.amount` + the possible wire_fees charged for this operation, must be lower than the `available` amount of the `wallet_account_id` 
+        * `payment_amount.currency` must match with the currency of the wallet identified by `wallet_account_id` and also must match the beneficiary bank account currency.
+        * `value_date` format follows the format `yyyy-MM-dd` where `yyyy` = year, `MM` is the month with 0-left padded (January = 01, December = 12). `dd` is the day of the month. The value date must be greather or equals to today.
+        
+      parameters: 
+        - name: bankAccount
+          in: body 
+          required: true
+          description: The payment request
+          schema:
+            $ref: '#/definitions/PaymentRequest'
+          
+      responses:
+        "200": 
+          description: Payment request OK, it will return the id of payment, and the financial data of the payment including the amount to be paid to the beneficiary, the wire_fees charged for this operation, and the total amount to be charged in your wallet 
+          schema:
+            $ref: '#/definitions/PaymentResponse'
+        "400": 
+          description: Invalid request, some validation is not met. The response message will contains additional details about the issue with the request. If you receive this response, no operation is done. 
+          schema: 
+            $ref: '#/definitions/ErrorResponse'
+            
+  "/operation/payment-quote": 
+    post: 
+      tags: 
+        - Operations
+      summary: Simulates a payment to a beneficiary's bank account
+      operationId: doPaymentQuote
+      description: | 
+      
+        Simulates a new payment to a beneficiary bank account. 
+        
+        This operation can be used as validator, as all the validations performed in the `POST /operation/payment` are performed here. 
+        
+        It also returns the possible wire_fees that will be applied to the payment when it will be effectively performed. This way customers could know in advance how much they will be charged before performing a real payment.
+        
+      parameters: 
+        - name: bankAccount
+          in: body 
+          required: true
+          description: The payment request
+          schema:
+            $ref: '#/definitions/PaymentRequest'
+          
+      responses:
+        "200": 
+          description: Payment simulation OK, it will return the wire fees that will be charged if the payment is effectively done.
+          schema:
+            $ref: '#/definitions/PaymentQuoteResponse'
+        "400": 
+          description: Invalid request, some validation is not met. The response message will contains additional details about the issue with the request.
+          schema: 
+            $ref: '#/definitions/ErrorResponse'
+            
+            
+  "/data/assets/country": 
+    get: 
+      tags: 
+        - Data Assets
+      summary: Gets the list of available countries 
+      security: []
+      responses: 
+        "200": 
+          description: List of all countries available in the platform. Remember to use always iso3 when required in other operations. 
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Country'
+  "/data/assets/currency": 
+    get: 
+      tags: 
+        - Data Assets
+      summary: Gets the list of available currencies 
+      security: []
+      responses: 
+        "200": 
+          description: List of all currencies available in the platform. Remember to use always iso when required in other operations. 
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Currency'
+  "/data/assets/country/{country}/cities": 
+    get: 
+      tags: 
+        - Data Assets
+      summary: Searchs for cities inside a country 
+      parameters: 
+        - name: country
+          description: iso-3 code of the country
+          required: true
+          in: path
+          type: string 
+        - name: searchTerm
+          description: searchTerm to search cities by name (at least 3 characters are required)
+          required: true
+          in: query
           type: string
-          minLength: 1
-          example: John
-        lastName:
-          description: User last name
-          type: string
-          minLength: 1
-          example: Smith
-        email:
-          $ref: '#/components/schemas/Email'
-  headers:
-    ExpiresAfter:
-      description: date in UTC when token expires
-      schema:
+      security: []
+      responses: 
+        "200": 
+          description: List of all found cities that matches the searchTerm given as input. Empty list if no cities have been found 
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/City'
+        "400": 
+          description: Invalid request; country does not exists or searchTerm is not provided or at least have 3 characters. 
+          schema: 
+            $ref: '#/definitions/ErrorResponse'
+  
+
+# An object to hold data types that can be consumed and produced by operations.
+# These data types can be primitives, arrays or models.
+definitions:
+  City: 
+    required: 
+      - "id"
+      - "name"
+    properties: 
+      id: 
+        type: "number"
+        example: 123412
+      name: 
+        type: "string"
+        example: "Madrid"
+        
+  Currency: 
+    required: 
+      - "iso_numeric"
+      - "iso"
+      - "name"
+    properties: 
+      iso_numeric: 
+        type: "number"
+        example: 978
+        description: "ISO-numeric code of the currency (ISO 4217)"
+      iso: 
+        type: "string"
+        example: "EUR"
+        description: "ISO alphanumeric code of the currency (ISO 4217)"
+      name: 
+        type: "string"
+        example: "Euro"
+  Country: 
+    required: 
+      - "iso_numeric"
+      - "iso2"
+      - "iso3"
+      - "name"
+    properties: 
+      iso_numeric: 
+        type: "number"
+        example: 724
+        description: "ISO-numeric code of the country (ISO 3166)"
+      iso2: 
+        type: "string"
+        example: "ES"
+        description: "ISO-2 code of the country (ISO 3166)"
+      iso3: 
+        type: "string"
+        example: "ESP"
+        description: "ISO-3 code of the country (ISO 3166)"
+      name: 
+        type: "string"
+        example: "Spain"
+        description: "Name in english of the country"
+
+
+  PaymentQuoteResponse: 
+    required: 
+      - "wire_fees"
+      - "payment_amount"
+      - "total_amount"
+    properties: 
+      wire_fees: 
+        required: 
+          - "amount"
+          - "currency"
+        properties: 
+          amount: 
+            type: "number"
+            example: 5
+          currency: 
+            type: "string"
+            example: "EUR"
+        type: "object"
+      payment_amount: 
+        required: 
+          - "amount"
+          - "currency"
+        properties: 
+          amount: 
+            type: "number"
+            example: 1000.5
+          currency: 
+            type: "string"
+            example: "EUR"
+        type: "object"
+      total_amount: 
+        required: 
+          - "amount"
+          - "currency"
+        properties: 
+          amount: 
+            type: "number"
+            example: 1005.5
+          currency: 
+            type: "string"
+            example: "EUR"
+        type: "object"
+    
+  PaymentResponse: 
+    required: 
+      - "payment_id"
+      - "wire_fees"
+      - "payment_amount"
+      - "total_amount"
+    properties: 
+      payment_id: 
+        type: "number"
+        example: 12341234
+      wire_fees: 
+        required: 
+          - "amount"
+          - "currency"
+        properties: 
+          amount: 
+            type: "number"
+            example: 5
+          currency: 
+            type: "string"
+            example: "EUR"
+        type: "object"
+      payment_amount: 
+        required: 
+          - "amount"
+          - "currency"
+        properties: 
+          amount: 
+            type: "number"
+            example: 1000.5
+          currency: 
+            type: "string"
+            example: "EUR"
+        type: "object"
+      total_amount: 
+        required: 
+          - "amount"
+          - "currency"
+        properties: 
+          amount: 
+            type: "number"
+            example: 1005.5
+          currency: 
+            type: "string"
+            example: "EUR"
+        type: "object"
+  PaymentRequest: 
+    required: 
+      - "beneficiary_id"
+      - "beneficiary_bank_account_id"
+      - "wallet_account_id"
+      - "payment_amount"
+      - "payment_reference_notes"
+      - "value_date"
+    properties: 
+      beneficiary_id: 
+        type: "number"
+        example: 12341234
+      beneficiary_bank_account_id: 
+        type: "number"
+        example: 11234
+      wallet_account_id: 
+        type: "number"
+        example: 234
+      payment_amount: 
+        required: 
+          - "amount"
+          - "currency"
+        properties: 
+          amount: 
+            type: "number"
+            example: 1000.5
+          currency: 
+            type: "string"
+            example: "EUR"
+        type: "object"
+      payment_reference_notes: 
+        type: "string"
+        example: "payment reference notes (free text)"
+      value_date: 
+        type: "string"
+        example: "2019-01-24"
+  BankAccountType: 
+    type: string
+    enum: &BANKACCOUNTTYPE
+      - IBAN
+      - STANDARD
+      - ABA-FEDWIRE
+  BeneficiaryBankAccount: 
+    required: 
+      - "id"
+      - "name"
+      - "type"
+      - "account_number"
+      - "bank"
+      - "swift_code"
+      - "currency"
+      - "use_intermediary_bank"
+    properties: 
+      id: 
+        type: "number"
+        example: 12341234
+      name: 
+        type: "string"
+        example: "Bank Account test"
+      type: 
+        type: "string"
+        enum: *BANKACCOUNTTYPE
+        example: "IBAN"
+      account_number: 
+        type: "string"
+        example: "ES6621000418401234567891"
+      bank: 
+        type: "string"
+        example: "CAIXABANK"
+      swift_code: 
+        type: "string"
+        example: "123412"
+      currency: 
+        type: "string"
+        example: "EUR"
+      routing_code: 
+        type: "string"
+        example: "12341234"
+      use_intermediary_bank: 
+        type: "boolean"
+        example: true
+      intermediary_bank: 
+        required: 
+          - "swift_code"
+          - "bank"
+        properties: 
+          further_credit_of: 
+            type: "string"
+            example: "Test"
+          account_number: 
+            type: "string"
+            example: "123412341234"
+          swift_code: 
+            type: "string"
+            example: "12341"
+          bank: 
+            type: "string"
+            example: "BANK"
+        type: "object"
+        
+  BeneficiaryBankAccountCreation: 
+    required: 
+      - "name"
+      - "type"
+      - "account_number"
+      - "bank"
+      - "swift_code"
+      - "currency"
+      - "use_intermediary_bank"
+    properties: 
+      id: 
+        type: "number"
+        example: 12341234
+      name: 
+        type: "string"
+        example: "Bank Account test"
+      type: 
+        type: "string"
+        enum: *BANKACCOUNTTYPE
+        example: "IBAN"
+      account_number: 
+        type: "string"
+        example: "ES6621000418401234567891"
+      bank: 
+        type: "string"
+        example: "CAIXABANK"
+      swift_code: 
+        type: "string"
+        example: "123412"
+      currency: 
+        type: "string"
+        example: "EUR"
+      routing_code: 
+        type: "string"
+        example: "12341234"
+        description: required if type of account is `ABA-FEDWIRE`
+      use_intermediary_bank: 
+        type: "boolean"
+        example: true
+      intermediary_bank: 
+        description: If `use_intermediary_bank` is true this field must be provided
+        required: 
+          - "swift_code"
+          - "bank"
+        properties: 
+          further_credit_of: 
+            type: "string"
+            example: "Test"
+          account_number: 
+            type: "string"
+            example: "123412341234"
+          swift_code: 
+            type: "string"
+            example: "12341"
+          bank: 
+            type: "string"
+            example: "BANK"
+        type: "object"
+
+
+  CreationDto: 
+    required: 
+      - "id"
+    properties:
+      id:
+        type: number
+        example: 23452345
+        
+  StatusEnum: 
+    type: string
+    enum: &STATUS
+      - ACTIVE
+      - INACTIVE
+      - PENDING
+      - AUTHORIZED
+  CustomerTypeEnum: 
+    type: string
+    enum: &CUSTOMERTYPE
+      - INDIVIDUAL
+      - CORPORATE
+  Beneficiary:
+    required: 
+      - "name"
+      - "status"
+      - "id"
+      - "type"
+      - "address"
+    properties: 
+      id: 
+        type: "number"
+        example: 2342323
+      status: 
+        type: string 
+        example: "ACTIVE"
+        enum: *STATUS
+      name: 
+        type: "string"
+        example: "Beneficiary Test Name"
+      note: 
+        type: "string"
+        example: "Some note of the customer"
+      type: 
+        type: "string"
+        enum: *CUSTOMERTYPE
+        example: "INDIVIDUAL"
+      email: 
+        type: "string"
+        example: "test@test.com"
+      phone: 
+        type: "string"
+        example: "+34 645543788"
+      address: 
+        required: 
+          - "address"
+          - "country"
+        properties: 
+          address: 
+            type: "string"
+            example: "Street X, number 7, B"
+          city_id: 
+            type: "number"
+            example: 1234123
+          country: 
+            type: "string"
+            example: "ESP"
+          postal_code: 
+            type: "string"
+            example: "13343"
+        type: "object"
+  BeneficiaryCreation:
+    required: 
+      - "name"
+      - "type"
+      - "address"
+    properties: 
+      name: 
+        type: "string"
+        example: "Beneficiary Test Name"
+      note: 
+        type: "string"
+        example: "Some note of the customer"
+      type: 
+        type: "string"
+        enum: *CUSTOMERTYPE
+        example: "INDIVIDUAL"
+      email: 
+        type: "string"
+        example: "test@test.com"
+      phone: 
+        type: "string"
+        example: "+34 645543788"
+      address: 
+        required: 
+          - "address"
+          - "country"
+        properties: 
+          address: 
+            type: "string"
+            example: "Street X, number 7, B"
+          city_id: 
+            type: "number"
+            example: 1234123
+          country: 
+            type: "string"
+            example: "ESP"
+          postal_code: 
+            type: "string"
+            example: "13343"
+        type: "object"
+  Wallet:
+    required: 
+      - "id"
+      - "name"
+      - "currency"
+      - "iban_number"
+      - "status"
+      - "swift_code"
+      - "statement"
+    properties: 
+      id: 
+        type: "string"
+        example: "48c33b49-1544-4e1c-ab6a-d4ed23681338"
+      name: 
+        type: "string"
+        example: "Test Account USD"
+      currency: 
+        type: "string"
+        example: "USD"
+      iban_number: 
+        type: "string"
+        example: "132165 96816 8461"
+      status: 
         type: string
-        format: date-time
-  # Security scheme definitions that can be used across the specification.
-  securitySchemes:
-    main_auth: # security definition name (you can name it as you want)
-      # the following options are specific to oauth2 type
-      type: oauth2 # authorization type, one of: oauth2, apiKey, http
-      flows:
-        implicit:
-          authorizationUrl: 'http://example.com/api/oauth/dialog'
-          scopes:
-            'read:users': read users info
-            'write:users': modify or remove users
-    api_key:  # security definition name (you can name it as you want)
-      type: apiKey 
-      # The following options are specific to apiKey type
-      in: header # Where API key will be passed: header or query
-      name: api_key # API key parameter name
-    basic_auth: # security definition name (you can name it as you want)
-      type: http
-      scheme: basic
+        enum: *STATUS
+        example: "ACTIVE"
+      swift_code: 
+        type: "string"
+        example: "BKBK ES"
+      statement: 
+        required: 
+          - "current_balance"
+          - "available_balance"
+          - "pending_in"
+          - "pending_out"
+        properties: 
+          current_balance: 
+            type: "number"
+            example: 0
+          available_balance: 
+            type: "number"
+            example: 0
+          pending_in: 
+            type: "number"
+            example: 0
+          pending_out: 
+            type: "number"
+            example: 0
+        type: "object"
+
+
+  ErrorResponse:
+    required:
+      - "code"
+      - "message"
+    properties:
+      code:
+        type: "string"
+      message:
+        type: "string"
+  LoginResponse:
+    required:
+      - "sessionToken"
+    properties:
+      session_token:
+        type: "string"
+        example: "7b13dfaf482c416c984003af4854f88e1552926359344"
+      expires_in:
+        description: Expiration time in seconds
+        type: number
+        example: 1800
+  LoginRequest:
+    required:
+      - "username"
+      - "password"
+    properties:
+      username:
+        type: "string"
+      password:
+        type: "string"
