@@ -1,0 +1,8 @@
+
+apiTitle: 'Zohan Customer API '
+splitSpec: false
+codeSamples: false
+swaggerUI: true
+travis: true
+repo: grey-systems/zohan-customer-api-docs
+oasVersion: 3.0.0
