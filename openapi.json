@@ -305,7 +305,7 @@
         "tags": [
           "Beneficiaries"
         ],
-        "summary": "Gets the list of bank accounts that belongs to a  beneficiary",
+        "summary": "Creates a bank account for an existent beneficiary",
         "parameters": [
           {
             "name": "id",
