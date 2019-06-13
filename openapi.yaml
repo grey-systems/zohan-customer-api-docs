@@ -548,9 +548,11 @@ definitions:
       - beneficiary_bank_account_id
       - wallet_account_id
       - payment_amount
-      - payment_reference_notes
-      - value_date
     properties:
+      transfer_reference:
+        type: string
+        example: '123412341234'
+        description: 'Optional. Reference of the payment. Recommended: It''s recommended to use a code unique in your system, so that you can later can locate the payments using this code'
       beneficiary_id:
         type: number
         example: 12341234
